@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Um cantinho pra você 💗
 
-## Getting Started
+Um pequeno site, feito com calma, pra alguém especial. Sem cobrança, sem pressa, no ritmo dela.
 
-First, run the development server:
+> "Autonomia, baixa fricção, presença silenciosa."
+
+## O que tem
+
+- **Tela inicial** com duas opções suaves: `Quero um mimo` e `Quero meu espaço`.
+- **Mimos** — 9 vales interativos (Cinema, Jantar, Massagem, Gameplay, Praia, Café na Cama, Maratona, Doce, Preguiça) em formato de "ticket", com tilt 3D, brilho que segue o cursor, carimbo "resgatado" e mini chuva de coraçõezinhos quando ela toca em **Resgatar**. Ao resgatar, abre um **voucher elegante** com código único de resgate (`AC260428-GAM-4K1R`), data/hora, dados de "para/de", botão pra **copiar o código**, **compartilhar no WhatsApp** já com a mensagem pronta pro número configurado, e **imprimir** com layout otimizado em A5. Os resgates ficam salvos no `localStorage`, então ela pode reabrir o vale a qualquer momento via "Ver vale ♡".
+- **Espaço** — carrossel infinito e contínuo, com fotos (placeholder de gradiente + emoji — basta substituir por `<img />` em `src/data/carousel.ts`) e cartões de mensagem. Ele desacelera com o toque/hover, sem cobrar nada.
+- **Botão flutuante** `Me dê um motivo para sorrir` (compactado em mobile como `um sorriso`) que abre um cartão com uma frase aleatória de uma lista personalizada.
+- **Transições suaves entre telas** com GSAP — efeito "suspiro" (escala leve, blur, fade), nada brusco.
+- Suporte a `prefers-reduced-motion`.
+
+## Stack
+
+- [Next.js 16](https://nextjs.org/) (App Router, Turbopack)
+- [React 19](https://react.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS 4](https://tailwindcss.com/)
+- [GSAP 3](https://gsap.com/) + [@gsap/react](https://gsap.com/resources/React/)
+- Fontes: [Quicksand](https://fonts.google.com/specimen/Quicksand) (UI), [Fraunces](https://fonts.google.com/specimen/Fraunces) (display itálico) e [Caveat](https://fonts.google.com/specimen/Caveat) (manuscrita)
+
+## Rodando
+
+Requer **Node 22** e **pnpm**.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+nvm use 22
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Build de produção:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm build
+pnpm start
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Personalizando para ela
 
-## Learn More
+Tudo que importa fica em `src/data/`:
 
-To learn more about Next.js, take a look at the following resources:
+- `src/data/smiles.ts` — array de elogios / piadas internas / lembretes pro botão flutuante.
+- `src/data/vouchers.ts` — vales (título, descrição, emoji, cor de cada um).
+- `src/data/carousel.ts` — slides do carrossel "espaço". Cada item pode ser `type: "message"` (cartão de texto) ou `type: "photo"` (cartão de foto).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Para usar fotos reais no carrossel:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Adicione as imagens em `public/fotos/` (ex.: `public/fotos/01.jpg`).
+2. Em `src/data/carousel.ts`, troque o objeto `photo` por algo como:
 
-## Deploy on Vercel
+   ```ts
+   { id: "photo-1", type: "photo", caption: "Bali, 2024", emoji: "", gradient: "linear-gradient(...)" }
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. No componente `src/components/EspacoScreen.tsx`, substitua o bloco do emoji por `<img src="/fotos/01.jpg" alt="..." className="w-full h-full object-cover" />` quando o item tiver um campo de imagem.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Paleta
+
+Definida em `src/app/globals.css` (variáveis CSS com escopo de tema do Tailwind 4):
+
+- Lavanda: `#d6c8ec` / `#b9a4dc`
+- Rosa suave: `#f3d7e2` / `#e7b3c6`
+- Fundo creme: `#fbf7fb`
+- Texto: `#4a3a55`
+
+## Estrutura
+
+```
+src/
+  app/
+    layout.tsx                  # fontes + metadados
+    page.tsx                    # ponto de entrada
+    globals.css                 # paleta lavanda/rosa, utilidades + @media print
+  components/
+    StageRouter.tsx             # gerencia transições "suspiro" entre telas
+    HomeScreen.tsx              # tela inicial com dois CTAs
+    MimosScreen.tsx             # vales interativos com GSAP
+    EspacoScreen.tsx            # carrossel infinito suave
+    SmileButton.tsx             # botão flutuante "me dê um motivo para sorrir"
+    RedeemedVoucherModal.tsx    # voucher de resgate elegante (print + WhatsApp)
+  lib/
+    voucher-utils.ts            # geração de código, persistência, link WhatsApp
+  data/
+    smiles.ts
+    vouchers.ts
+    carousel.ts
+```
+
+## Mudando o número do WhatsApp
+
+O número de destino do botão "Compartilhar no WhatsApp" fica em `src/lib/voucher-utils.ts`:
+
+```ts
+export const TARGET_WHATSAPP = "5585999393807";
+```
+
+Formato: `55` (BR) + DDD + número, sem espaços/símbolos.
+
+Feito com calma, pra ela. 🌷
